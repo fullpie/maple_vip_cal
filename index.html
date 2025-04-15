@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>楓之谷 寵物箱試算機</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f6f6f6; }
+    h1 { font-size: 1.5em; }
+    label, select, input { display: block; margin: 10px 0 5px; }
+    input[type="number"] { width: 100px; }
+    #result { margin-top: 20px; font-weight: bold; font-size: 1.2em; }
+    .section { background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 0 6px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <h1>楓之谷 寵物隨機箱 課金試算機</h1>
+
+  <div class="section">
+    <label>欲使用點數總額：</label>
+    <input type="number" id="totalPoints" value="12000" />
+
+    <label>現金折扣（例如94折 = 0.94）：</label>
+    <input type="number" id="discountRate" value="0.94" step="0.01" />
+
+    <label>VIP階級：</label>
+    <select id="vipTier">
+      <option value="30">金牌（30點/點數）</option>
+      <option value="40">鑽石（40點/點數）</option>
+    </select>
+
+    <label>W寵物中獎機率（%）：</label>
+    <input type="number" id="petRate" value="2.1" step="0.1" />
+
+    <label>W寵物價值（台幣）：</label>
+    <input type="number" id="petValue" value="1000" />
+
+    <label>3顆寵物代幣兌換白金槌子價值（台幣）：</label>
+    <input type="number" id="hammerValue" value="52" />
+
+    <button onclick="calculate()">計算結果</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    function calculate() {
+      const totalPoints = parseFloat(document.getElementById("totalPoints").value);
+      const discountRate = parseFloat(document.getElementById("discountRate").value);
+      const vipRate = parseFloat(document.getElementById("vipTier").value);
+      const petRate = parseFloat(document.getElementById("petRate").value) / 100;
+      const petValue = parseFloat(document.getElementById("petValue").value);
+      const hammerValue = parseFloat(document.getElementById("hammerValue").value);
+
+      const totalCost = totalPoints * discountRate;
+      const vipPoints = totalPoints * vipRate;
+      const returnedPoints = Math.floor(vipPoints / 45000) * 150;
+      const totalUsablePoints = totalPoints + returnedPoints;
+      const totalDraws = Math.floor(totalUsablePoints / 50);
+
+      const expectedPerDraw = (petRate * petValue) + ((1 - petRate) * (hammerValue / 3));
+      const totalExpectedReturn = expectedPerDraw * totalDraws;
+      const finalProfit = totalExpectedReturn - totalCost;
+
+      document.getElementById("result").innerHTML = `
+        抽數：${totalDraws} 抽<br>
+        預期回收：約 ${totalExpectedReturn.toFixed(2)} 元台幣<br>
+        實際花費：約 ${totalCost.toFixed(2)} 元台幣<br>
+        <span style="color: ${finalProfit >= 0 ? 'green' : 'red'}">${finalProfit >= 0 ? '預期賺錢' : '預期虧損'}：${finalProfit.toFixed(2)} 元</span>
+      `;
+    }
+  </script>
+</body>
+</html>
